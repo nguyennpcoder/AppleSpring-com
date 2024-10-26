@@ -65,23 +65,27 @@ public class CategoryController {
     }
 
     @PostMapping
-    public Category createCategory(@RequestParam("name") String name,
-                                   @RequestParam("image") MultipartFile image) {
+    public ResponseEntity<Category> createCategory(@RequestParam("name") String name,
+                                                   @RequestParam("image") MultipartFile image) {
+        if (image.isEmpty() || name.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         String imageName = image.getOriginalFilename();
         Path imagePath = Paths.get("images").resolve(imageName);
-
         try {
             Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             throw new RuntimeException("Failed to store image", e);
         }
-
         Category category = new Category();
         category.setName(name);
         category.setCateimg(imageName);
-
-        return categoryService.saveCategory(category);
+        Category savedCategory = categoryService.saveCategory(category);
+        return ResponseEntity.ok(savedCategory);
     }
+
+
+
 
     @PutMapping("/{id}")
     public Category updateCategory(@PathVariable Long id,

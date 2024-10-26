@@ -12,9 +12,17 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect # Specify MySQL 8 dialect for Hibernate
 
+  # Enable multipart file upload
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 # JWT Secret Configuration
 jwt:
   secret: nguyennpcoderJWTabcdefghijklmnoabcdefghijk # JWT secret key used for signing the tokens
+
 logging:
   level:
     org.springframework.security: DEBUG  # Enable detailed Spring Security logs

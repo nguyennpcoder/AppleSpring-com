@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import io.jsonwebtoken.Jwts;
@@ -21,6 +22,7 @@ import io.jsonwebtoken.security.Keys;
 
 import java.security.Key;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -110,9 +112,16 @@ public class UserService {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
     private String generateToken(String username, Long roleId) {
+        // Fetch user role name
+        String role = userRepository.findByPhoneNumber(username)
+                .map(user -> user.getRole().getName())
+                .orElseThrow(() -> new UsernameNotFoundException("Role not found for user: " + username));
+
+        System.out.println("Adding role to token: " + role);  // Debug statement
+
         return Jwts.builder()
                 .setSubject(username)
-                .claim("roleId", roleId)
+                .claim("role", role)  // Ensure this matches the claim name used in extraction
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

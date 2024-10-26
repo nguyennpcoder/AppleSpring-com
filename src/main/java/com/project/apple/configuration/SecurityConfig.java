@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +18,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+//prePostEnabled = true cho phép bạn sử dụng @PreAuthorize và @PostAuthorize.
+// securedEnabled = true cho phép bạn sử dụng @Secured.
+// jsr250Enabled = true cho phép bạn sử dụng @RolesAllowed.
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
@@ -37,8 +42,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasRole("admin")
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").hasAnyRole("admin", "user")
+
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/categories/**").hasRole("admin")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/categories/**").hasRole("admin")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/categories/**").hasRole("admin")
                         .requestMatchers(HttpMethod.GET, "/api/v1/colors/**").hasAnyRole("admin", "user")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/colors/**").hasRole("admin")
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()

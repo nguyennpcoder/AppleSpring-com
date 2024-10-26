@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -70,13 +72,29 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 .getSubject();
     }
 
+private Long extractRoleId(String token) {
+    Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+    Claims claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+    System.out.println("Claims from token: " + claims);  // Debug statement
+    return claims.get("roleId", Long.class);  // Extract role ID
+}
+
     private boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        Claims claims = extractAllClaims(token);
-        List<String> roles = claims.get("roles", List.class);
-        System.out.println("Roles from token: " + roles);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        Long roleId = extractRoleId(token);  // Use the new method to extract role ID
+        System.out.println("Role ID from token: " + roleId);  // Debug statement
+
+        // Check if user role ID matches the role ID in the token
+        boolean roleMatch = userDetails.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_" + roleId));
+
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && roleMatch);
     }
+
 
     private boolean isTokenExpired(String token) {
         final Claims claims = Jwts.parserBuilder()
@@ -95,5 +113,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 
 }
