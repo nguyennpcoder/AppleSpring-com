@@ -23,4 +23,5 @@ public class Order {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+    private boolean isActive = true;
 }

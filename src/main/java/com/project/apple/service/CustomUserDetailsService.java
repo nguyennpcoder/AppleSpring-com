@@ -1,4 +1,3 @@
-
 package com.project.apple.service;
 
 import com.project.apple.model.User;
@@ -10,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -22,10 +21,20 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
         User user = userRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (!user.isActive()) {
+            throw new UsernameNotFoundException("User account is not active");
+        }
+
+        System.out.println("Name found: " + user.getFullname());
+        System.out.println("Role: " + user.getRole().getName());
+
+        String roleName = "ROLE_" + user.getRole().getName();
+
         return new org.springframework.security.core.userdetails.User(
                 user.getPhoneNumber(),
                 user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getName()))
+                Collections.singletonList(new SimpleGrantedAuthority(roleName))
         );
     }
 }

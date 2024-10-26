@@ -24,4 +24,5 @@ public class ProductDetails {
     private Color color;
 
     private Boolean inStock;
+    private boolean isActive = true;
 }

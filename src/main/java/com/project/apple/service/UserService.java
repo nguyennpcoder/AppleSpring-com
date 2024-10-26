@@ -20,6 +20,7 @@ import io.jsonwebtoken.security.Keys;
 
 
 import java.security.Key;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -47,8 +48,22 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    public User updateUserActiveStatus(Long id, boolean active) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            // Check if the user has the admin role with ID 2 and the request is to deactivate the account
+            if (user.getRole().getId() == 2 && !active) {
+                throw new IllegalArgumentException("Cannot deactivate an admin account");
+            }
+
+            user.setActive(active);
+            userRepository.save(user);
+            return user;
+        } else {
+            return null;  // Or throw an exception if the user is not found
+        }
     }
 
     public User registerUser(User user) {
@@ -74,6 +89,9 @@ public class UserService {
     public String loginUser(String phoneNumber, String password, Long roleId) {
         User user = userRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with phone number: " + phoneNumber));
+        if (!user.isActive()) {
+            throw new BadCredentialsException("Tài khoản của " + user.getFullname() + " đã bị khóa, vui lòng liên hệ Admin!");
+        }
         if (!user.getRole().getId().equals(roleId)) {
             throw new BadCredentialsException("Invalid role");
         }

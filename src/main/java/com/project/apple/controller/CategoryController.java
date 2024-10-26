@@ -7,6 +7,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,10 +26,15 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping
-    public List<Category> getAllCategories() {
-        return categoryService.getAllCategories();
-    }
+    public ResponseEntity<List<Category>> getCategories(Authentication authentication) {
+        // Check the roles of the authenticated user
+        String role = authentication != null ? authentication.getAuthorities().iterator().next().getAuthority() : "ROLE_user";
 
+        // Call the service method to get categories based on role
+        List<Category> categories = categoryService.getCategoriesForUser(role);
+
+        return ResponseEntity.ok(categories);
+    }
     @GetMapping("/{id}")
     public Category getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id);
@@ -112,4 +120,6 @@ public class CategoryController {
         categoryService.saveCategory(category);
         return ResponseEntity.ok(category);
     }
+
+
 }

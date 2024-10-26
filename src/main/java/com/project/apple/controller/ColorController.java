@@ -1,9 +1,11 @@
 package com.project.apple.controller;
 
+import com.project.apple.model.Category;
 import com.project.apple.model.Color;
 import com.project.apple.service.ColorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,10 +23,8 @@ public class ColorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Color> getColorById(@PathVariable Long id) {
-        return colorService.getColorById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Color getColorById(@PathVariable Long id) {
+        return colorService.getColorById(id);
     }
 
     @PostMapping
@@ -37,9 +37,16 @@ public class ColorController {
         return ResponseEntity.ok(colorService.updateColor(id, colorDetails));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteColor(@PathVariable Long id) {
-        colorService.deleteColor(id);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}/{active}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Color> updateColorActiveStatus(@PathVariable Long id, @PathVariable boolean active) {
+        Color color = colorService.getColorById(id);
+        if (color == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        color.setActive(active);
+        colorService.saveColor(color);
+        return ResponseEntity.ok(color);
     }
 }

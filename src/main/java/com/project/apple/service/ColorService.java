@@ -1,5 +1,6 @@
 package com.project.apple.service;
 
+import com.project.apple.model.Category;
 import com.project.apple.model.Color;
 import com.project.apple.responsitory.ColorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,8 @@ public class ColorService {
         return colorRepository.findAll();
     }
 
-    public Optional<Color> getColorById(Long id) {
-        return colorRepository.findById(id);
+    public Color getColorById(Long id) {
+        return colorRepository.findById(id).orElse(null);
     }
 
     public Color createColor(Color color) {
@@ -31,8 +32,14 @@ public class ColorService {
         color.setName(colorDetails.getName());
         return colorRepository.save(color);
     }
-
+    public Color saveColor(Color color) {
+        return colorRepository.save(color);
+    }
     public void deleteColor(Long id) {
-        colorRepository.deleteById(id);
+        Color color = colorRepository.findById(id).orElse(null);
+        if (color != null) {
+            color.setActive(false); // Set the category as inactive
+            colorRepository.save(color);
+        }
     }
 }

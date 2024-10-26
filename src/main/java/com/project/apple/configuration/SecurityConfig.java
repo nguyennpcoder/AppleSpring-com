@@ -31,12 +31,24 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers("/api/v1/users/login", "/api/v1/users/register").permitAll()
-                        .requestMatchers("/api/v1/categories/**").permitAll()
+                        .requestMatchers("/api/v1/users").hasRole("admin")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasRole("admin")
                         .requestMatchers("/images/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll() // Allow GET requests
-                        .requestMatchers(HttpMethod.POST, "/api/v1/products").hasRole("ADMIN") // Restrict POST to admin
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").hasAnyRole("admin", "user")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/categories/**").hasRole("admin")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/colors/**").hasAnyRole("admin", "user")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/colors/**").hasRole("admin")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products").hasRole("admin")
+
+
+                        .requestMatchers("/error").permitAll()
+
                         .anyRequest().authenticated()
+
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -44,11 +56,13 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userDetailsService);
+        authenticationManagerBuilder.userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }
 

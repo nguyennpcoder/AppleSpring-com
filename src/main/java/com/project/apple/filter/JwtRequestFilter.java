@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
-
+import java.util.List;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -59,6 +59,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         chain.doFilter(request, response);
     }
+
     private String extractUsername(String token) {
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
         return Jwts.parserBuilder()
@@ -71,6 +72,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
+        Claims claims = extractAllClaims(token);
+        List<String> roles = claims.get("roles", List.class);
+        System.out.println("Roles from token: " + roles);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
@@ -82,4 +86,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 .getBody();
         return claims.getExpiration().before(new Date());
     }
+
+    private Claims extractAllClaims(String token) {
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 }

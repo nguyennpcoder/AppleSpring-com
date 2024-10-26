@@ -12,5 +12,6 @@ public class Category {
     private Long id;
     private String name;
     private String cateimg; // New field for image path
-    private boolean active = true;
+    @Column(name = "is_active")
+    private boolean active  = true;
 }

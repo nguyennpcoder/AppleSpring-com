@@ -13,12 +13,15 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll().stream()
-                .filter(Category::isActive)
-                .collect(Collectors.toList());
+    public List<Category> getCategoriesForUser(String role) {
+        // If the user is an admin, return all categories
+        if ("ROLE_admin".equals(role)) {
+            return categoryRepository.findAll();  // Admin sees all categories
+        } else {
+            // Regular user or unauthenticated requests only see active categories
+            return categoryRepository.findByActiveTrue();
+        }
     }
-
     public Category getCategoryById(Long id) {
         return categoryRepository.findById(id).orElse(null);
     }
@@ -30,9 +33,8 @@ public class CategoryService {
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id).orElse(null);
         if (category != null) {
-            category.setActive(false); // Set the category as inactive
+            category.setActive(false);
             categoryRepository.save(category);
         }
     }
-
 }

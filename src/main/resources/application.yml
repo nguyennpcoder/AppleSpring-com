@@ -6,13 +6,15 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: none
-    show-sql: true
+      ddl-auto: none # No automatic schema updates (use 'update', 'create', 'create-drop', or 'none' as per your need)
+    show-sql: true # Show SQL queries in the console
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQL8Dialect # Specify MySQL 8 dialect for Hibernate
 
-
+# JWT Secret Configuration
 jwt:
-  secret: nguyennpcoderJWTabcdefghijklmnoabcdefghijk
-
+  secret: nguyennpcoderJWTabcdefghijklmnoabcdefghijk # JWT secret key used for signing the tokens
+logging:
+  level:
+    org.springframework.security: DEBUG  # Enable detailed Spring Security logs

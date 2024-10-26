@@ -26,4 +26,5 @@ public class OrderItem {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+    private boolean isActive = true;
 }
