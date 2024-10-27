@@ -1,12 +1,18 @@
+
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/apple?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+#    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3307/apple?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    url: jdbc:mysql://root:nsonPiIbzvynTYYecyPShqverExxqOgj@autorack.proxy.rlwy.net:41936/railway
     username: root
-    password: ${MYSQL_ROOT_PASSWORD:checkra1n}
+#    password: ${MYSQL_ROOT_PASSWORD:checkra1n}
+    password: nsonPiIbzvynTYYecyPShqverExxqOgj
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+
   jpa:
     hibernate:
-      ddl-auto: none # No automatic schema updates (use 'update', 'create', 'create-drop', or 'none' as per your need)
+#      ddl-auto: none # No automatic schema updates (use 'update', 'create', 'create-drop', or 'none' as per your need)
+      ddl-auto: update
     show-sql: true # Show SQL queries in the console
     properties:
       hibernate:
@@ -26,3 +32,5 @@ jwt:
 logging:
   level:
     org.springframework.security: DEBUG  # Enable detailed Spring Security logs
+#server:
+#  port: 8899
