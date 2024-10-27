@@ -84,9 +84,6 @@ public class CategoryController {
         return ResponseEntity.ok(savedCategory);
     }
 
-
-
-
     @PutMapping("/{id}")
     public Category updateCategory(@PathVariable Long id,
                                    @RequestParam("name") String name,

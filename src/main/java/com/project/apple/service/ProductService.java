@@ -3,12 +3,15 @@ package com.project.apple.service;
 import com.project.apple.dto.ProductDTO;
 import com.project.apple.model.Category;
 import com.project.apple.model.Product;
+import com.project.apple.model.ProductImg;
 import com.project.apple.responsitory.CategoryRepository;
 import com.project.apple.responsitory.ProductRepository;
+import com.project.apple.responsitory.ProductImgRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -27,21 +30,34 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         product.setCategory(category);
 
-        // Set other fields as needed
+        if (productDTO.getThumbnailUrl() != null) {
+            ProductImg thumbnail = new ProductImg();
+            thumbnail.setUrlImg(productDTO.getThumbnailUrl());
+            thumbnail.setProduct(product);
+            product.setThumbnail(thumbnail);
+        }
+
+        if (productDTO.getImageUrls() != null) {
+            List<ProductImg> images = productDTO.getImageUrls().stream().map(url -> {
+                ProductImg img = new ProductImg();
+                img.setUrlImg(url);
+                img.setProduct(product);
+                return img;
+            }).collect(Collectors.toList());
+            product.setImages(images);
+        }
 
         return productRepository.save(product);
     }
-
+    public boolean isProductNameExists(String name) {
+        return productRepository.existsByName(name);
+    }
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
     public Product getProductById(Long id) {
         return productRepository.findById(id).orElse(null);
-    }
-
-    public Product saveProduct(Product product) {
-        return productRepository.save(product);
     }
 
     public void deleteProduct(Long id) {
