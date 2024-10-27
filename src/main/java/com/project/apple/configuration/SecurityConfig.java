@@ -42,7 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/users/**").hasRole("admin")
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/api/v1/roles/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/categories/**").hasRole("admin")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/categories/**").hasRole("admin")
                         .requestMatchers(HttpMethod.POST, "/api/v1/categories/**").hasRole("admin")
