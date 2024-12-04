@@ -50,6 +50,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/colors/**").hasRole("admin")
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/products").hasRole("admin")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasRole("admin")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/products/**").hasRole("admin")
 
 
                         .requestMatchers("/error").permitAll()
